@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Analytics } from '@vercel/analytics/react';
 import { TypingArea } from './components/typing/TypingArea';
 import { Home } from './pages/Home';
 import { Progress } from './pages/Progress';
@@ -48,8 +49,11 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#1a1a1a] flex flex-col items-center justify-center p-4">
-      {renderView()}
-    </div>
+    <>
+      <div className="min-h-screen bg-[#1a1a1a] flex flex-col items-center justify-center p-4">
+        {renderView()}
+      </div>
+      <Analytics />
+    </>
   );
 }
