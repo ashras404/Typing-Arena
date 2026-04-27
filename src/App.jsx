@@ -1,3 +1,4 @@
+import React, { useEffect, useMemo, useRef } from 'react';
 import React, { useState } from 'react';
 import { Analytics } from '@vercel/analytics/react';
 import { TypingArea } from './components/typing/TypingArea';
