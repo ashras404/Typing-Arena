@@ -9,8 +9,6 @@ import { CHALLENGE_MODES } from "../../utils/modes";
 export const TypingArea = ({ text }) => {
   const [sessionKey, setSessionKey] = useState(0);
   const activeModeId = useStore((state) => state.activeMode) || "standard";
-
-  // Look up the full config for the selected mode
   const modeConfig =
     CHALLENGE_MODES.find((m) => m.id === activeModeId) || CHALLENGE_MODES[0];
 
@@ -35,18 +33,18 @@ const TypingSession = ({ text, mode, onRestart }) => {
   }, []);
 
   const handleMobileInput = (e) => {
-    const newValue = e.target.value;
-    if (newValue.length > typedText.length) {
-      const newChars = newValue.slice(typedText.length);
+    const inputType = e.nativeEvent.inputType;
+    const data = e.nativeEvent.data;
+    if (inputType === 'deleteContentBackward' || inputType === 'deleteWordBackward') {
+      window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Backspace' }));
+    } 
+    else if (data) {
+      const newChars = data.replace(' ', '');
       for (const char of newChars) {
         window.dispatchEvent(new KeyboardEvent('keydown', { key: char }));
       }
-    } else if (newValue.length < typedText.length) {
-      const diff = typedText.length - newValue.length;
-      for (let i = 0; i < diff; i++) {
-        window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Backspace' }));
-      }
     }
+    e.target.value = ' ';
   };
 
   // Standard Save Logic
@@ -60,8 +58,6 @@ const TypingSession = ({ text, mode, onRestart }) => {
       });
     }
   }, [status, saveSession, wpm, accuracy, weakKeys, mode]);
-
-  // Speed Burst "Sudden Death" Logic
   useEffect(() => {
     if (status === 'typing' && mode.id === 'speed_burst') {
       if (time >= 5 && wpm < mode.minWpm) {

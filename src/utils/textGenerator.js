@@ -1,10 +1,14 @@
 const TEXT_BANK = [
-  "Practice makes progress, not perfection. Each attempt builds skill through repetition and focused effort.",
-  "The quick brown fox jumps over the lazy dog. This sentence contains every letter in the English alphabet, making it perfect for typing practice.",
-  "Clean architecture isolates your business logic from the UI. This prevents unnecessary re-renders and keeps your application highly performant.",
-  "State management is crucial in complex applications. Using tools like Zustand allows you to decouple your global data from your local component tree.",
-  "Consistency is the key to mastering any skill. Typing a little bit every day will build muscle memory much faster than cramming for hours.",
-  "Good developers write code that machines can understand. Great developers write code that other humans can understand."
+  "Thankyou for giving this a chance, really appreciate it. I hope you have fun playing around with it and maybe even find it useful for improving your typing skills!",
+  "Meow is not meowing because meow need to meow more to meow the meow. Meow is meowing because meow is meowing.",
+  "The secret to great typing is practice, practice, and more practice. Don’t give up!",
+  "The dev name is Ashras, What a cool name right? I know, I know, you wish your name was Ashras too.",
+  "Typa Stuff We be doing instead of preparing for Finals, haina?",
+  "The quick brown fox rage quit after the lazy dog stole its snacks and WiFi password.",
+  "Typing fast is cool until you accidentally send 'I love you' to your professor instead of 'I’ll review'.",
+  "My code works perfectly, I just have no idea why. Please don’t touch anything.",
+  "I opened 47 tabs to stay productive, and now I’m emotionally attached to all of them.",
+  "If at first you don’t succeed, rename the function and pretend it was intentional."
 ];
 
 export const getRandomText = () => {
