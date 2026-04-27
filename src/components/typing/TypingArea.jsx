@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import Character from "./Character";
 import { useTypingEngine } from "../../hooks/useTypingEngine";
 import { useMetrics } from "../../hooks/useMetrics";
@@ -25,18 +25,31 @@ export const TypingArea = ({ text }) => {
 };
 
 const TypingSession = ({ text, mode, onRestart }) => {
-  const { typedText, cursorIndex, status, weakKeys } = useTypingEngine(
-    text,
-    mode,
-  );
-  // Extract 'time' from our updated hook
+  const { typedText, cursorIndex, status, weakKeys, setStatus } = useTypingEngine(text, mode);
   const { wpm, accuracy, time } = useMetrics(typedText, text, status);
   const saveSession = useStore((state) => state.saveSession);
   const mobileInputRef = useRef(null);
+
   useEffect(() => {
     mobileInputRef.current?.focus();
   }, []);
 
+  const handleMobileInput = (e) => {
+    const newValue = e.target.value;
+    if (newValue.length > typedText.length) {
+      const newChars = newValue.slice(typedText.length);
+      for (const char of newChars) {
+        window.dispatchEvent(new KeyboardEvent('keydown', { key: char }));
+      }
+    } else if (newValue.length < typedText.length) {
+      const diff = typedText.length - newValue.length;
+      for (let i = 0; i < diff; i++) {
+        window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Backspace' }));
+      }
+    }
+  };
+
+  // Standard Save Logic
   useEffect(() => {
     if (status === "finished") {
       saveSession({
@@ -48,6 +61,15 @@ const TypingSession = ({ text, mode, onRestart }) => {
     }
   }, [status, saveSession, wpm, accuracy, weakKeys, mode]);
 
+  // Speed Burst "Sudden Death" Logic
+  useEffect(() => {
+    if (status === 'typing' && mode.id === 'speed_burst') {
+      if (time >= 5 && wpm < mode.minWpm) {
+        setStatus('failed');
+      }
+    }
+  }, [time, wpm, status, mode, setStatus]);
+
   const charStates = useMemo(() => {
     return text.split("").map((char, index) => {
       if (index === cursorIndex) return "cursor";
@@ -58,13 +80,15 @@ const TypingSession = ({ text, mode, onRestart }) => {
     });
   }, [text, typedText, cursorIndex]);
 
-  if (status === "finished") {
+  // Pass status down to ResultScreen so it knows if we failed or finished
+  if (status === "finished" || status === "failed") {
     return (
       <ResultScreen
         wpm={wpm}
         accuracy={accuracy}
         weakKeys={weakKeys}
         onRestart={onRestart}
+        status={status}
       />
     );
   }
@@ -81,14 +105,20 @@ const TypingSession = ({ text, mode, onRestart }) => {
       className="flex flex-col items-center w-full max-w-4xl mx-auto p-8 animate-fade-in relative"
       onClick={() => mobileInputRef.current?.focus()}
     >
+      {/* THE HIDDEN MOBILE INPUT - Fully wired up */}
       <input
         ref={mobileInputRef}
         type="text"
         className="absolute opacity-0 w-0 h-0 p-0 m-0 pointer-events-none"
+        value={typedText}
+        onChange={handleMobileInput}
         autoComplete="off"
         autoCorrect="off"
-        autoCapitalize="off"
+        autoCapitalize="none"
         spellCheck="false"
+        data-gramm="false"
+        data-gramm_editor="false"
+        data-enable-grammarly="false"
       />
 
       <div className="flex justify-between w-full mb-8 text-gray-400 font-mono text-xl items-center">
