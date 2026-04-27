@@ -23,7 +23,8 @@ export const TypingArea = ({ text }) => {
 };
 
 const TypingSession = ({ text, mode, onRestart }) => {
-  const { typedText, cursorIndex, status, weakKeys, setStatus } = useTypingEngine(text, mode);
+  const { typedText, cursorIndex, status, weakKeys, setStatus } =
+    useTypingEngine(text, mode);
   const { wpm, accuracy, time } = useMetrics(typedText, text, status);
   const saveSession = useStore((state) => state.saveSession);
   const mobileInputRef = useRef(null);
@@ -35,16 +36,18 @@ const TypingSession = ({ text, mode, onRestart }) => {
   const handleMobileInput = (e) => {
     const inputType = e.nativeEvent.inputType;
     const data = e.nativeEvent.data;
-    if (inputType === 'deleteContentBackward' || inputType === 'deleteWordBackward') {
-      window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Backspace' }));
-    } 
-    else if (data) {
-      const newChars = data.replace(' ', '');
+    if (
+      inputType === "deleteContentBackward" ||
+      inputType === "deleteWordBackward"
+    ) {
+      window.dispatchEvent(new KeyboardEvent("keydown", { key: "Backspace" }));
+    } else if (data) {
+      const newChars = data.replace(" ", "");
       for (const char of newChars) {
-        window.dispatchEvent(new KeyboardEvent('keydown', { key: char }));
+        window.dispatchEvent(new KeyboardEvent("keydown", { key: char }));
       }
     }
-    e.target.value = ' ';
+    e.target.value = " ";
   };
 
   // Standard Save Logic
@@ -59,9 +62,9 @@ const TypingSession = ({ text, mode, onRestart }) => {
     }
   }, [status, saveSession, wpm, accuracy, weakKeys, mode]);
   useEffect(() => {
-    if (status === 'typing' && mode.id === 'speed_burst') {
+    if (status === "typing" && mode.id === "speed_burst") {
       if (time >= 5 && wpm < mode.minWpm) {
-        setStatus('failed');
+        setStatus("failed");
       }
     }
   }, [time, wpm, status, mode, setStatus]);
@@ -101,13 +104,12 @@ const TypingSession = ({ text, mode, onRestart }) => {
       className="flex flex-col items-center w-full max-w-4xl mx-auto p-8 animate-fade-in relative"
       onClick={() => mobileInputRef.current?.focus()}
     >
-      {/* THE HIDDEN MOBILE INPUT - Fully wired up */}
       <input
         ref={mobileInputRef}
         type="text"
         className="absolute opacity-0 w-0 h-0 p-0 m-0 pointer-events-none"
-        value={typedText}
-        onChange={handleMobileInput}
+        defaultValue=" "
+        onInput={handleMobileInput}
         autoComplete="off"
         autoCorrect="off"
         autoCapitalize="none"
